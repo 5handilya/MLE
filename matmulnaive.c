@@ -23,3 +23,5 @@ int main(){
 		C[i][j] += A[i][k] * B[k][j];
     float seconds = (float) (clock() - start) / CLOCKS_PER_SEC;
     printf("%.4f\n", seconds);
+    return 0;
+}
