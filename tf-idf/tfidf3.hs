@@ -1,7 +1,9 @@
 import Data.Map (Map)
 import qualified Data.Map as Map
 
+-- --------------
 -- I. TYPES
+-- --------------
 
 type Document = [String]
 type Corpus = [Document]
@@ -12,8 +14,9 @@ type IDF = Map String Double
 type TFIDF = Map String Double
 
 
-
+-- --------------
 -- II. FUNCTIONS
+-- --------------
 
 -- 1. Term Frequency
 computeTF :: Document -> Map String Double
