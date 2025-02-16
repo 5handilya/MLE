@@ -39,6 +39,7 @@ def tf_idf(documents):
 
 # Test data 
 documents = [
+    "kanye west is over party",
     "the cat sat on the mat",
     "the dog sat on the log",
     "cats and dogs are animals"
