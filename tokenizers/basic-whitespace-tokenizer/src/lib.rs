@@ -42,7 +42,7 @@ mod tests {
 }
 
 // Benchmarks
-#[cfg(feature = "bench")]
+#[cfg(feature = "benches")]
 mod benches {
     use super::*;
     use criterion::{black_box, criterion_group, criterion_main, Criterion};
