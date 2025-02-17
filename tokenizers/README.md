@@ -7,10 +7,10 @@ From basic text splitting to advanced ML tokenizers, with implementation checkli
 ### 1.1 Whitespace Tokenizer
 - Split text by whitespace
 - [x] Handle multiple spaces
-- [ ] Basic punctuation handling
+- [x] Basic punctuation handling
 - [x] Python implementation
 - [ ] Rust implementation
-- [ ] Documented "Building a Basic Whitespace Tokenizer"
+- [ ] Documented
 
 ### 1.2 Character-Level Tokenizer
 - Split text into individual characters
@@ -18,7 +18,7 @@ From basic text splitting to advanced ML tokenizers, with implementation checkli
 - [ ] Basic stats (char frequency)
 - [ ] Python implementation
 - [ ] Rust implementation
-- [ ] Documented "Character-Level Tokenization Fundamentals"
+- [ ] Documented
 
 ## Level 2: Intermediate Tokenizers
 
@@ -28,7 +28,7 @@ From basic text splitting to advanced ML tokenizers, with implementation checkli
 - Capture special tokens (URLs, emails)
 - [ ] Python implementation (`re` module)
 - [ ] Rust implementation (`regex` crate)
-- [ ] Documented "Regex Patterns for Smarter Tokenization"
+- [ ] Documented
 
 ### 2.2 Vocabulary-Based Tokenizer
 - Build vocabulary from corpus
@@ -36,7 +36,7 @@ From basic text splitting to advanced ML tokenizers, with implementation checkli
 - Add special tokens ([UNK], [PAD])
 - [ ] Python implementation
 - [ ] Rust implementation
-- [ ] Documented "Vocabulary Management in Tokenizers"
+- [ ] Documented
 
 ## Level 3: Subword Tokenizers
 
@@ -46,30 +46,29 @@ From basic text splitting to advanced ML tokenizers, with implementation checkli
 - Encoding/decoding logic
 - [ ] Python implementation (numpy/pure Python)
 - [ ] Rust implementation (rayon for parallelism)
-- [ ] Documented "BPE Tokenizer from Scratch"
+- [ ] Documented
 
 ### 3.2 WordPiece Tokenizer
 - Implement likelihood-based merging
 - Handle subword ambiguity
 - [ ] Python implementation
 - [ ] Rust implementation
-- [ ] Documented "WordPiece vs BPE: Key Differences"
+- [ ] Documented
 
 ### 3.3 SentencePiece Unigram
 - Implement unigram language model
 - Probabilistic subword selection
 - [ ] Python implementation
 - [ ] Rust implementation
-- [ ] Documented "Unigram Tokenization Deep Dive"
+- [ ] Documented
 
 ## Level 4: Production-Grade Tokenizers
 
 ### 4.1 Unicode Normalization
-- Implement NFC/NFD normalization
-- Handle emojis/combined characters
+- [ ] Implement NFC/NFD normalization
 - [ ] Python implementation (`unicodedata`)
 - [ ] Rust implementation (`unicode-normalization`)
-- [ ] Documented "Unicode Handling in ML Tokenizers"
+- [ ] Documented
 
 ### 4.2 Pre-tokenization Pipeline
 - Combine multiple strategies:
@@ -78,7 +77,7 @@ From basic text splitting to advanced ML tokenizers, with implementation checkli
   - Regex rules
 - [ ] Python implementation
 - [ ] Rust implementation
-- [ ] Documented "Building a Tokenization Pipeline"
+- [ ] Documented
 
 ## Level 5: Advanced ML Integration
 
@@ -87,14 +86,14 @@ From basic text splitting to advanced ML tokenizers, with implementation checkli
 - Implement padding/truncation
 - [ ] Python implementation
 - [ ] Rust implementation (with ONNX support)
-- [ ] Documented "Tokenization for Model Serving"
+- [ ] Documented
 
 ### 5.2 Parallel Tokenization
 - Implement multithreaded preprocessing
 - Batch processing optimizations
 - [ ] Python implementation (Ray/multiprocessing)
 - [ ] Rust implementation (tokio async)
-- [ ] Documented "High-Performance Tokenization"
+- [ ] Documented
 
 ## Level 6: State-of-the-Art (SoTA)
 
@@ -103,21 +102,21 @@ From basic text splitting to advanced ML tokenizers, with implementation checkli
 - Handle BOM (Byte Order Mark)
 - [ ] Python implementation
 - [ ] Rust implementation
-- [ ] Documented "Byte-Level BPE for Multilingual NLP"
+- [ ] Documented
 
 ### 6.2 Tiktoken-Style Tokenizer
 - Implement cl100k_base equivalent
 - Optimize for speed with caching
 - [ ] Python implementation
 - [ ] Rust implementation
-- [ ] Documented "Building a GPT-4 Compatible Tokenizer"
+- [ ] Documented
 
 ### 6.3 Distributed Tokenizer Training
 - Implement sharded vocabulary building
 - Merge partial vocabularies
 - [ ] Python implementation (PySpark/Dask)
 - [ ] Rust implementation (Rayon distributed)
-- [ ] Documented "Distributed Tokenizer Training"
+- [ ] Documented
 
 ## Level 7: Specialized Tokenizers
 
@@ -126,14 +125,14 @@ From basic text splitting to advanced ML tokenizers, with implementation checkli
 - Implement CLIP-style tokenization
 - [ ] Python implementation
 - [ ] Rust implementation
-- [ ] Documented "Multimodal Tokenization Strategies"
+- [ ] Documented
 
 ### 7.2 Biological Sequence Tokenizer
 - Handle DNA/protein sequences
 - Implement k-mer tokenization
 - [ ] Python implementation
 - [ ] Rust implementation
-- [ ] Documented "Bioinformatics Meets NLP Tokenization"
+- [ ] Documented
 
 ## Final Challenge
 
@@ -145,4 +144,4 @@ From basic text splitting to advanced ML tokenizers, with implementation checkli
   - PostProcessors
 - [ ] Python implementation
 - [ ] Rust implementation
-- [ ] Documented "Anatomy of HF Tokenizers Library"
+- [ ] Documented
