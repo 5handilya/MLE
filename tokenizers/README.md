@@ -44,7 +44,8 @@ From basic text splitting to advanced ML tokenizers, with implementation checkli
 - Implement BPE training
 - Merge operations
 - Encoding/decoding logic
-- [ ] Python implementation (numpy/pure Python)
+- [ ] Naive Python implementation
+- [ ] Optimized Python implementation (numpy/pure Python)
 - [ ] Rust implementation (rayon for parallelism)
 - [ ] Documented
 
