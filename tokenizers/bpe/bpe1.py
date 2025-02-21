@@ -1,113 +1,108 @@
-def get_pair_stats(vocab):
-    """
-    Count frequency of adjacent pairs in the vocabulary
-    
-    Parameters:
-        vocab (dict): A dictionary with tokens as keys and their frequencies as values
-    
-    Returns:
-        pairs (dict): A dictionary with pairs as keys and their aggregated frequencies
-    """
-    pairs = {}
-    for word, freq in vocab.items():
-        for i_c in range(len(word) - 1):
-            curr_pair = (word[i_c], word[i_c] + 1)
-            pairs = pairs.get(curr_pair, 0) + freq
-    return pairs
 
-def merge_vocab(pair, vocab):
-    """
-    Merge a given pair in the vocabulary
-    
-    Parameters:
-        pair (tuple): The pair of symbols to merge
-        vocab (dict): Current vocabulary mapping (tuple of tokens -> frequency)
-    
-    Returns:
-        dict: New vocabulary after merging the given pair
-    """
-    new_vocab = {}
-    replacement = "".join(pair)
-    for word, freq in vocab.items():
-        new_word = []
+########################################################## OVERVIEW #######################################################
+#
+#       I.   Training :      Learn merge rules from training corpus
+#       II.  Encoding :      Apply all learned rules to input
+#       III. Testing  :      (TODO) Track OOVs & perf profiling
+#
+############################################################# LIB #########################################################
+
+class BPETokenizer:
+
+    # Train BPE on a corpus of texts
+    def train(self, texts):
+
+        # 0. Pre-processing
+        ids = self._pre_process(texts)
+
+        # 1. Initialize vocabulary
+        self._initialize_vocab(ids)
+
+        # 3. Learn merge rules. Terminal condition = target vocab size specified at init
+        while len(self.vocab) < self.target_vocab_size:
+            pair_freqs      = self._count_token_pairs(ids)
+            most_freq_pair  = max(pair_freqs, key=pair_freqs.get)
+            new_token_id    = len(self.vocab)
+            ids             = self._merge_pair(ids, most_freq_pair, new_token_id)
+            self._learn_merge_rule(most_freq_pair, new_token_id)
+            print(f"Vocab size: {len(self.vocab)}, target: {self.target_vocab_size}")
+
+    def encode(self, text):
+        # Convert text to a list of byte values (initial token IDs)
+        text_bytes = text.encode("utf-8")
+        ids = list(text_bytes)
+        # Iteratively apply merge rules until no more merges can be performed
+        while len(ids) >= 2: # For sanity, the real break comes from the membership check below
+            # Count occurrences of adjacent token pairs
+            pair_freqs = self._count_token_pairs(ids)
+            # Identify the earliest mergeable pair in pair_freqs by checking the lowest matching merge rule index
+            first_pair_to_merge = min(pair_freqs, key=lambda p: self.merge_rules.get(p, float("inf")))
+            # Stop merging if the identified pair is not in the merge rules - no more merges possible
+            if first_pair_to_merge not in self.merge_rules:
+                break
+            # Apply the merge
+            merged_id = self.merge_rules[first_pair_to_merge]
+            ids = self._merge_pair(ids, first_pair_to_merge, merged_id)
+        return ids
+
+    def decode(self, ids):
+        # decode the byte sequence corresponding to ids in vocab using utf-8
+        text_bytes = b"".join(self.vocab[id] for id in ids)
+        text = text_bytes.decode("utf-8", errors="replace")
+        return text
+
+# internals -----------------------------------------------------------------------------------------------------------------
+
+    def __init__(self, target_vocab_size):
+        # Initialize the tokenizer with target vocabulary size as the terminal condition
+        self.target_vocab_size = target_vocab_size
+        self.vocab = {}  # token id -> byte mapping
+        self.inverse_vocab = {}  # byte -> id mapping
+        self.merge_rules = {}  # stores learned BPE merge rules (int, int) : int which will be used for encoding
+
+    def _pre_process(self, texts):
+        # Simple pp for now -- split into chars, turn into ints
+        # cant handle punctuation etc properly 
+        concat = "".join(("".join(texts)).split())
+        encoded_corpus = concat.encode("utf-8")
+        ids = list(encoded_corpus)
+        return ids
+
+    def _count_characters(self, texts):
+        # Count frequency of each character in the given text
+        freqs = {}
+        for word in texts:
+            for char in word:
+                freqs[char] = freqs.get(char, 0) + 1
+        return freqs
+
+    def _initialize_vocab(self, ids):
+        # Initialize a id : byte dict with given ids
+        self.vocab = {id: bytes([id]) for id in range(256)}
+
+    def _count_token_pairs(self, ids):
+        # Count frequencies of adjacent token pairs
+        pair_freqs = {}
+        for pair in zip(ids, ids[1:]):
+            pair_freqs[pair] = pair_freqs.get(pair, 0) + 1
+        return pair_freqs
+
+    def _learn_merge_rule(self, pair, id):
+        # Add a new merge rule for pair of ids -> id & update vocabulary
+        self.merge_rules[pair] = id
+        self.vocab[id] = self.vocab[pair[0]] + self.vocab[pair[1]]
+
+    def _merge_pair(self, tokens, target_pair, new_token):
+        # Apply a merge rule to a sequence of tokens
         i = 0
-        while i < len(word):
-            if i < len(word) - 1 and (word[i], word[i + 1]) == pair:
-                new_word.append(replacement)
+        result = []
+        while i < len(tokens):
+            if (i < len(tokens) - 1) and ((tokens[i], tokens[i+1]) == target_pair):
+                result.append(new_token)
                 i += 2
             else:
-                new_word.append(word[i])
+                result.append(tokens[i])
                 i += 1
-        new_vocab[tuple(new_word)] = freq
-    return new_vocab
+        return result
 
-
-def byte_pair_encoding(corpus, num_merges=None, vocab_size=None):
-    """
-    Perform Byte Pair Encoding (BPE) on the provided corpus.
-    
-    Parameters:
-        corpus (dict): Mapping from word (str) to its frequency (int).
-        num_merges (int, optional): Maximum number of merge operations to perform.
-        vocab_size (int, optional): Target vocabulary size (unique tokens).
-        
-        **Note:** Exactly one of num_merges or vocab_size must be provided.
-    
-    Returns:
-        tuple: (merges, final_vocab)
-            - merges (list): List of merge operations performed (each a tuple of tokens).
-            - final_vocab (dict): The final vocabulary (mapping from tuple of tokens to frequency).
-    """
-    # check that exactly one termination condition is provided.
-    if (num_merges is None and vocab_size is None) or (num_merges is not None and vocab_size is not None):
-        raise ValueError("Please specify exactly one termination condition: either num_merges or vocab_size.")
-    
-    # initialize vocabulary: represent each word as a tuple of characters with an end-of-word marker.
-    vocab = {tuple(word) + ("</w>",): freq for word, freq in corpus.items()}
-    merges = []
-    
-    while True:
-        pairs = get_pair_stats(vocab)
-        if not pairs:
-            break  # No more pairs to merge.
-        # Find the most frequent pair.
-        best_pair = max(pairs, key=pairs.get)
-        merges.append(best_pair)
-        vocab = merge_vocab(best_pair, vocab)
-        
-        # Termination condition: by number of merges.
-        if num_merges is not None:
-            if len(merges) >= num_merges:
-                break
-        # Termination condition: by vocabulary size.
-        elif vocab_size is not None:
-            current_tokens = set()
-            for word in vocab:
-                current_tokens.update(word)
-            if len(current_tokens) >= vocab_size:
-                break
-    
-    return merges, vocab
-
-
-if __name__ == "__main__":
-    # Example corpus: words mapped to their frequencies.
-    corpus = {
-        "low": 5,
-        "lowest": 2,
-        "newer": 6,
-        "wider": 3
-    }
-    
-    # Option 1: Terminate after a fixed number of merges (e.g., 10 merges)
-    merges, final_vocab = byte_pair_encoding(corpus, num_merges=10)
-    print("Merge operations (num_merges=10):")
-    for merge in merges:
-        print(merge)
-    
-    print("\nFinal vocabulary tokens with frequencies:")
-    for tokens, freq in final_vocab.items():
-        print(" ".join(tokens), ":", freq)
-    
-    # Option 2: Terminate when the vocabulary size reaches a target (e.g., 50 unique tokens)
-    # merges, final_vocab = byte_pair_encoding(corpus, vocab_size=50)
+################################################## mischief managed ################################################## 
